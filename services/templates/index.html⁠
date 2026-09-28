@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Story Translator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans">
+    
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 text-center">
+            <h1 class="text-3xl font-bold text-blue-600">AI Story Translator</h1>
+            <p class="text-gray-500 mt-1">Translate your videos into another language with AI</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        
+        <!-- Workflow Progress -->
+        <div class="flex justify-between mb-8 relative">
+            <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -z-10 transform -translate-y-1/2"></div>
+            <div id="progress-bar" class="absolute top-1/2 left-0 w-0 h-1 bg-blue-600 -z-10 transform -translate-y-1/2 transition-all duration-500"></div>
+            
+            <div class="step-indicator active" data-step="1">1. Upload</div>
+            <div class="step-indicator" data-step="2">2. Transcribe</div>
+            <div class="step-indicator" data-step="3">3. Translate</div>
+            <div class="step-indicator" data-step="4">4. Voice</div>
+            <div class="step-indicator" data-step="5">5. Video</div>
+        </div>
+
+        <!-- Alerts -->
+        <div id="status-alert" class="hidden mb-6 p-4 rounded-lg text-center font-medium transition-all"></div>
+
+        <!-- Step 1: Upload -->
+        <div id="step-1" class="workflow-card bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+            <h2 class="text-xl font-semibold mb-4">01. Upload Video</h2>
+            <div class="border-2 border-dashed border-gray-300 rounded-xl p-10 text-center hover:bg-gray-50 transition cursor-pointer" id="drop-zone" onclick="document.getElementById('video-upload').click()">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                <p class="mt-2 text-sm text-gray-600">Drag and drop a video, or click to browse</p>
+                <p class="text-xs text-gray-400 mt-1">MP4, MOV, AVI, MKV, WEBM</p>
+                <input type="file" id="video-upload" class="hidden" accept="video/*">
+            </div>
+            <div id="file-info" class="hidden mt-4 bg-blue-50 p-3 rounded text-sm text-blue-800 flex justify-between items-center">
+                <span id="filename-display"></span>
+                <button id="upload-btn" class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">Upload & Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Transcribe -->
+        <div id="step-2" class="workflow-card hidden bg-white p-8 rounded-xl shadow-sm border border-gray-100 mt-6">
+            <h2 class="text-xl font-semibold mb-4">02. Transcribe Video</h2>
+            <p class="text-sm text-gray-500 mb-4">Extract audio and convert spoken words into text using AI.</p>
+            <button id="transcribe-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition">Extract & Transcribe</button>
+            
+            <div id="transcription-result" class="hidden mt-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Original Script (Editable)</label>
+                <textarea id="original-script" rows="6" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                <button id="continue-step-3" class="mt-4 bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-900">Confirm & Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Translate -->
+        <div id="step-3" class="workflow-card hidden bg-white p-8 rounded-xl shadow-sm border border-gray-100 mt-6">
+            <h2 class="text-xl font-semibold mb-4">03. Translate Script</h2>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Source Language</label>
+                    <select id="source-lang" class="w-full p-2 border border-gray-300 rounded">
+                        <option value="Auto">Auto Detect</option>
+                        <option value="English">English</option>
+                        <option value="Khmer">Khmer</option>
+                        <option value="Chinese">Chinese</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Target Language</label>
+                    <select id="target-lang" class="w-full p-2 border border-gray-300 rounded">
+                        <option value="Khmer">Khmer</option>
+                        <option value="English">English</option>
+                        <option value="Chinese">Chinese</option>
+                        <option value="Thai">Thai</option>
+                        <option value="Vietnamese">Vietnamese</option>
+                        <option value="Korean">Korean</option>
+                        <option value="Japanese">Japanese</option>
+                        <option value="Indonesian">Indonesian</option>
+                    </select>
+                </div>
+            </div>
+            <button id="translate-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition">Translate Script</button>
+
+            <div id="translation-result" class="hidden mt-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Translated Script (Editable)</label>
+                <textarea id="translated-script" rows="6" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                <button id="continue-step-4" class="mt-4 bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-900">Confirm & Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Text to Speech -->
+        <div id="step-4" class="workflow-card hidden bg-white p-8 rounded-xl shadow-sm border border-gray-100 mt-6">
+            <h2 class="text-xl font-semibold mb-4">04. Generate AI Voice</h2>
+            <div class="mb-4">
+                <label class="block text-sm text-gray-600 mb-1">Voice Gender</label>
+                <select id="voice-gender" class="w-full p-2 border border-gray-300 rounded">
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                </select>
+            </div>
+            <button id="generate-voice-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition">Generate Voice</button>
+
+            <div id="voice-result" class="hidden mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <p class="text-sm text-gray-600 mb-2">Preview Generated Audio:</p>
+                <audio id="audio-preview" controls class="w-full mb-4"></audio>
+                <button id="continue-step-5" class="w-full bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-900">Looks good! Create Final Video</button>
+            </div>
+        </div>
+
+        <!-- Step 5: Final Video -->
+        <div id="step-5" class="workflow-card hidden bg-white p-8 rounded-xl shadow-sm border border-gray-100 mt-6 text-center">
+            <h2 class="text-2xl font-semibold mb-2">05. Video Ready!</h2>
+            <p class="text-gray-500 mb-6">Your translated video has been successfully generated.</p>
+            
+            <div class="aspect-w-16 aspect-h-9 mb-6 bg-black rounded-lg overflow-hidden">
+                <video id="final-video" controls class="w-full h-auto max-h-96 object-contain"></video>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <a id="download-video" href="#" download class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 inline-flex items-center">
+                    Download Video
+                </a>
+                <button onclick="location.reload()" class="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300">
+                    Translate Another
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
